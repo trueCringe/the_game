@@ -13,9 +13,12 @@ public class Move : MonoBehaviour
     public float acceleration = 20f;
     public float deceleration = 10f;
     public float maxReversSpeed = -20f;
+    private Vector3 startPosition;
+    private Quaternion startRotation;
     void Start()
     {
-
+        startPosition = transform.position;
+        startRotation = transform.rotation;
     }
 
     // Update is called once per frame
@@ -39,12 +42,15 @@ public class Move : MonoBehaviour
         {
             speed = Mathf.MoveTowards(speed, maxReversSpeed, acceleration * Time.deltaTime);
         }
-        else 
+        else
         { speed = Mathf.MoveTowards(speed, 0, deceleration * Time.deltaTime); }
         transform.Translate(Vector3.forward * speed * Time.deltaTime * vertical);
         transform.Rotate(Vector3.up * horizontal * rspeed * Time.deltaTime);
 
-
+        if (OutOfBounds() || Input.GetKeyDown(KeyCode.Escape))
+        {
+            Reset();
+        }
 
     }
     private void OnTriggerEnter(Collider other)
@@ -60,5 +66,19 @@ public class Move : MonoBehaviour
             Debug.Log("finish!");
             gameMananger.FinishEnd(other.gameObject);
         }
+    }
+
+    private bool OutOfBounds()
+    {
+        if (transform.position.y < -3)
+            return true;
+        else
+            return false;
+    }
+    private void Reset()
+    {
+        transform.position = startPosition;
+        transform.rotation = startRotation;
+        speed = 0;
     }
 }
